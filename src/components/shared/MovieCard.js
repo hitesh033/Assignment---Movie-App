@@ -120,7 +120,7 @@ export class MovieCard extends LitElement {
             )
           : html``}
       </div>
-      ${this.page === 'search' && !this.loaded
+      ${this.page === 'search' && !this.loaded && this.movieList.length > 0
         ? html`
             <div class="load-all">
               <button @click="${() => this.loadAll()}" class="load-all-btn">

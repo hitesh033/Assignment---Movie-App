@@ -1,92 +1,80 @@
 import { css, LitElement, html } from 'lit-element';
+import { searchPageStyles } from './styles';
 import { MovieCard } from '../shared/MovieCard';
 
 export class SearchPage extends LitElement {
   static get properties() {
     return {
       results: { type: Array },
+      error: { type: String },
+      loading: { type: Boolean },
     };
   }
 
   static get styles() {
-    return css`
-      .search {
-        width: 100%;
-        position: relative;
-        display: flex;
-      }
-
-      .search-term {
-        width: 100%;
-        border: 3px solid rgb(31, 37, 51);
-        border-right: none;
-        padding: 5px;
-        height: 20px;
-        border-radius: 5px 0 0 5px;
-        outline: none;
-        color: #9dbfaf;
-      }
-
-      .search-term:focus {
-        color: rgb(31, 37, 51);
-      }
-
-      .search-button {
-        width: auto;
-        height: 36px;
-        border: 1px solid rgb(31, 37, 51);
-        background: rgb(31, 37, 51);
-        text-align: center;
-        color: #fff;
-        border-radius: 0 5px 5px 0;
-        cursor: pointer;
-        font-size: 15px;
-      }
-
-      .wrap {
-        width: 50%;
-        position: absolute;
-        top: 10%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-    `;
+    return [searchPageStyles];
   }
 
   constructor() {
     super();
     this.results = [];
+    this.loading = false;
   }
 
   async search(event) {
     event.preventDefault();
-    this.results = [];
-    const searchString = event.target.querySelector('#search').value;
-    const data = await fetch(
-      `http://www.omdbapi.com/?s=${searchString}&apikey=6c3a2d45`
-    ).then(r => r.json());
-    this.fetchMovies(data.Search);
+    try {
+      this.error = '';
+      this.loading = true;
+      this.results = [];
+      const searchString = event.target.querySelector('#search').value;
+      const data = await fetch(
+        `http://www.omdbapi.com/?s=${searchString}&apikey=6c3a2d45`
+      ).then(r => r.json());
+      if (data?.Error) {
+        this.loading = false;
+        this.handleError(data.Error);
+        return;
+      }
+      this.fetchMovies(data.Search);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   fetchMovies(search) {
-    search.forEach(async movie => {
-      const data = await fetch(
-        `http://www.omdbapi.com/?i=${movie.imdbID}&apikey=6c3a2d45`
-      ).then(r => r.json());
-      this.results.push(data);
-      const event = new CustomEvent('page-event:movie-list', {
-        detail: {
-          data: this.getTopFive(this.results),
-          rawData: this.results,
-          page: 'search',
-        },
+    try {
+      search.forEach(async movie => {
+        const data = await fetch(
+          `http://www.omdbapi.com/?i=${movie.imdbID}&apikey=6c3a2d45`
+        ).then(r => r.json());
+        this.results.push(data);
+        this.triggerEvent(this.results);
       });
-      this.shadowRoot.querySelector('#movieCard').dispatchEvent(event);
-    });
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   getTopFive(movies) {
     return movies.filter((movie, index) => index < 5);
+  }
+
+  triggerEvent(results) {
+    const event = new CustomEvent('page-event:movie-list', {
+      detail: {
+        data: this.getTopFive(results),
+        rawData: results,
+        page: 'search',
+      },
+    });
+    this.loading = false;
+    this.shadowRoot.querySelector('#movieCard').dispatchEvent(event);
+  }
+
+  handleError(error) {
+    this.triggerEvent([]);
+    this.error = error;
   }
 
   render() {
@@ -107,6 +95,10 @@ export class SearchPage extends LitElement {
 
       <div class="results">
         <app-movie-card id="movieCard"></app-movie-card>
+        ${this.results.length === 0 && this.error
+          ? html`<p class="error">${this.error}</p>`
+          : html``}
+        ${this.loading ? html`<p class="loader">Loading...</p>` : html``}
       </div>
     `;
   }
