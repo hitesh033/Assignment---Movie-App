@@ -1,4 +1,4 @@
-import { css, LitElement, html } from 'lit-element';
+import { css, LitElement, html } from 'lit';
 import { navigator } from 'lit-element-router';
 
 class NavigationLink extends navigator(LitElement) {

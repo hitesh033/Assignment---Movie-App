@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit-element';
+import { LitElement, html } from 'lit';
 import { movieCardStyles } from './styles.js';
 
 export class MovieCard extends LitElement {
@@ -21,11 +21,17 @@ export class MovieCard extends LitElement {
     this.addEventListener('page-event:movie-list', this.getData.bind(this));
   }
 
+  /**
+   * Remove event listeners once the component has been removed
+   */
   disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener('page-event:movie-list', this.getData.bind(this));
   }
 
+  /**
+   * Receives the event data dispatched from the source component (Featured or Search)
+   */
   getData({ detail }) {
     this.loaded = false;
     this.movieList = detail.data;
@@ -40,9 +46,13 @@ export class MovieCard extends LitElement {
   }
 
   render() {
-    console.log('featured card', this.movieList);
     return html`
       <div class="container">
+        ${this.page === 'search' && this.movieList?.length > 0
+          ? html`<h5 class="show-results">
+              Showing <b>${this.movieList?.length}</b> results.
+            </h5>`
+          : html``}
         ${this.movieList
           ? this.movieList.map(
               movie => html`
@@ -55,7 +65,12 @@ export class MovieCard extends LitElement {
                   </div>
                   <div class="movie-content">
                     <div class="movie-content-header">
-                      <h3 class="movie-title">
+                      <h3
+                        class="movie-title"
+                        title="${movie.Title} (${this.page === 'search'
+                          ? movie.Released
+                          : movie.Year})"
+                      >
                         ${movie.Title}
                         <span
                           >(${this.page === 'search'
@@ -68,7 +83,7 @@ export class MovieCard extends LitElement {
                     <div class="movie-info">
                       <div class="info-section">
                         <label>Awards</label>
-                        <span>${movie.Awards}</span>
+                        <span title="${movie.Awards}">${movie.Awards}</span>
                       </div>
                     </div>
                     ${this.page === 'search'
@@ -95,21 +110,25 @@ export class MovieCard extends LitElement {
                           <div class="movie-info">
                             <div class="info-section">
                               <label>Type</label>
-                              <span>${movie.Type}</span>
+                              <span title="${movie.Type}">${movie.Type}</span>
                             </div>
                             <div class="info-section">
                               <label>Genre</label>
-                              <span>${movie.Genre}</span>
+                              <span title="${movie.Genre}">${movie.Genre}</span>
                             </div>
                           </div>
                           <div class="movie-info">
                             <div class="info-section">
                               <label>Actors</label>
-                              <span>${movie.Actors}</span>
+                              <span title="${movie.Actors}"
+                                >${movie.Actors}</span
+                              >
                             </div>
                             <div class="info-section">
                               <label>Director</label>
-                              <span>${movie.Director}</span>
+                              <span title="${movie.Director}"
+                                >${movie.Director}</span
+                              >
                             </div>
                           </div>
                         `
@@ -120,7 +139,7 @@ export class MovieCard extends LitElement {
             )
           : html``}
       </div>
-      ${this.page === 'search' && !this.loaded && this.movieList.length > 0
+      ${this.page === 'search' && !this.loaded && this.rawSearchData.length > 5
         ? html`
             <div class="load-all">
               <button @click="${() => this.loadAll()}" class="load-all-btn">

@@ -1,4 +1,4 @@
-import { css, LitElement, html } from 'lit-element';
+import { LitElement, html } from 'lit';
 import { searchPageStyles } from './styles';
 import { MovieCard } from '../shared/MovieCard';
 
@@ -21,6 +21,9 @@ export class SearchPage extends LitElement {
     this.loading = false;
   }
 
+  /**
+   * Trigger the title based search
+   */
   async search(event) {
     event.preventDefault();
     try {
@@ -42,6 +45,9 @@ export class SearchPage extends LitElement {
     }
   }
 
+  /**
+   * Fetch movie information based on the imdb ids
+   */
   fetchMovies(search) {
     try {
       search.forEach(async movie => {
@@ -56,10 +62,16 @@ export class SearchPage extends LitElement {
     }
   }
 
+  /**
+   * Fetch the top five results
+   */
   getTopFive(movies) {
     return movies.filter((movie, index) => index < 5);
   }
 
+  /**
+   * Dispatches a custom event with the movie data (it holds both raw search data and the top five results)
+   */
   triggerEvent(results) {
     const event = new CustomEvent('page-event:movie-list', {
       detail: {

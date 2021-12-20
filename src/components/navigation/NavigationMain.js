@@ -27,7 +27,7 @@ export class NavigationMain extends router(LitElement) {
   static get routes() {
     return [
       {
-        name: '',
+        name: 'home',
         pattern: '',
       },
       {
@@ -64,7 +64,7 @@ export class NavigationMain extends router(LitElement) {
         <app-navigation-link href="/search">Search</app-navigation-link>
       </nav>
       <app-navigation-outlet active-route=${this.route}>
-        <div route=""><app-featured></app-featured></div>
+        <div route="home"><app-featured></app-featured></div>
         <div route="featured">
           <app-featured></app-featured>
         </div>

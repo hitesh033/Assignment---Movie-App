@@ -1,7 +1,6 @@
 import { css } from 'lit';
 
 export const movieCardStyles = css`
-  @import url('https://fonts.googleapis.com/css?family=Arimo:400,700');
   body {
     height: 100%;
     width: 100%;
@@ -103,6 +102,10 @@ export const movieCardStyles = css`
     font-size: 24px;
     margin: 0;
     display: table-cell;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 280px;
   }
 
   .movie-title > span {
@@ -111,6 +114,8 @@ export const movieCardStyles = css`
 
   .movie-info {
     margin-top: 1em;
+    border-bottom: 1px solid rgb(243, 243, 243);
+    padding-bottom: 15px;
   }
 
   .info-section {
@@ -138,6 +143,11 @@ export const movieCardStyles = css`
   .info-section span {
     font-weight: 700;
     font-size: 11px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 135px;
   }
 
   .plot {
@@ -165,6 +175,14 @@ export const movieCardStyles = css`
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 5px;
+  }
+
+  .show-results {
+    width: 100%;
+    text-align: center;
+    padding: 0;
+    font-size: 14px;
+    color: #5f5f5f;
   }
 
   @media screen and (max-width: 500px) {

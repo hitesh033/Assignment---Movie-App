@@ -31,6 +31,9 @@ export class FeaturedPage extends LitElement {
     this.getFeatured();
   }
 
+  /**
+   * Fetch movie data based on the predefined imdb ids
+   */
   async getFeatured() {
     try {
       this.imdbIds.forEach(async id => {
@@ -52,6 +55,9 @@ export class FeaturedPage extends LitElement {
     }
   }
 
+  /**
+   * Sets the error property to have the error message
+   */
   handleError(error) {
     this.error = error;
   }
